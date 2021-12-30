@@ -22,7 +22,7 @@ func persistTitleAndDesc(prev, next spec.Schema) spec.Schema {
 }
 
 func persistFields(prev, next spec.Schema) spec.Schema {
-	next.Title = util.FirstOf(next.Title, prev.Title, path.Base(prev.Ref.String()))
+	next.Title = util.FirstOf(path.Base(prev.Ref.String()), next.Title, prev.Title)
 	next.Description = util.FirstOf(next.Description, prev.Description)
 	if next.Items == nil {
 		next.Items = prev.Items

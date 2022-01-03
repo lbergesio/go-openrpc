@@ -49,6 +49,8 @@ func getConcreteType(in string) string {
 	switch in {
 	case reflect.Bool.String(), "boolean":
 		return reflect.Bool.String()
+	case reflect.Int.String(), "integer":
+		return reflect.Int.String()
 	default:
 		return in
 	}

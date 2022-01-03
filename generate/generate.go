@@ -11,6 +11,7 @@ import (
 	"os"
 	"path"
 	"path/filepath"
+	"reflect"
 	"regexp"
 	"strings"
 	"text/template"
@@ -46,6 +47,67 @@ func schemaAsJSONPretty(s spec.Schema) string {
 	ss := reg.ReplaceAllString(string(b), "")
 
 	return ss
+}
+
+func getConstraints(p spec.SchemaProps) string {
+	s := ""
+	fields := []string{"Format", "Maximum", "Minimum", "Pattern"}
+	e := reflect.ValueOf(&p).Elem()
+	for i, f := range fields {
+		fval := e.FieldByName(f).Interface()
+		if fval == reflect.Zero(reflect.TypeOf(fval)).Interface() {
+			continue
+		}
+		if i != 0 && s != "" {
+			s += "; "
+		}
+		s += fmt.Sprintf("%s:\"%v\"", util.LowerFirst(f), fval)
+	}
+	return s
+}
+
+func methodExampleRequestAsJSONPretty(m types.Method) string {
+	if len(m.Examples) == 0 {
+		return ""
+	}
+
+	params := make(map[string]interface{})
+	ex := m.Examples[0]
+	for _, p := range ex.Params {
+		params[p.Name] = p.Value
+	}
+
+	r := types.RequestJson{
+		Id:      1,
+		Jsonrpc: "2.0.0",
+		Method:  m.Name,
+		Params:  params,
+	}
+
+	j, err := json.MarshalIndent(r, "", "    ")
+	if err != nil {
+		return ""
+	}
+	return string(j)
+}
+
+func methodExampleResponseAsJSONPretty(m types.Method) string {
+	if len(m.Examples) == 0 {
+		return ""
+	}
+
+	ex := m.Examples[0]
+	r := types.ResponseJson{
+		Id:      1,
+		Jsonrpc: "2.0.0",
+		Result:  ex.Result.Value,
+	}
+
+	j, err := json.MarshalIndent(r, "", "    ")
+	if err != nil {
+		return ""
+	}
+	return string(j)
 }
 
 func maybeLookupComponentsContentDescriptor(cmpnts *types.Components, cd *types.ContentDescriptor) (rootCD *types.ContentDescriptor, err error) {
@@ -183,20 +245,23 @@ type object struct {
 
 func funcMap(openrpc *types.OpenRPCSpec1) template.FuncMap {
 	return template.FuncMap{
-		"programName":             getProgramName,
-		"derefSchema":             derefSchemaRecurse,
-		"schemaHasRef":            schemaHazRef,
-		"schemaAsJSONPretty":      schemaAsJSONPretty,
-		"lookupContentDescriptor": maybeLookupComponentsContentDescriptor,
-		"sanitizeBackticks":       util.SanitizeBackticks,
-		"inspect":                 util.Inpect,
-		"slice":                   util.Slice,
-		"camelCase":               util.CamelCase,
-		"lowerFirst":              util.LowerFirst,
-		"maybeMethodComment":      maybeMethodComment,
-		"maybeMethodParams":       maybeMethodParams,
-		"maybeMethodResult":       maybeMethodResult,
-		"maybeFieldComment":       maybeFieldComment,
+		"programName":                       getProgramName,
+		"derefSchema":                       derefSchemaRecurse,
+		"schemaHasRef":                      schemaHazRef,
+		"schemaAsJSONPretty":                schemaAsJSONPretty,
+		"methodExampleRequestAsJSONPretty":  methodExampleRequestAsJSONPretty,
+		"methodExampleResponseAsJSONPretty": methodExampleResponseAsJSONPretty,
+		"getConstraints":                    getConstraints,
+		"lookupContentDescriptor":           maybeLookupComponentsContentDescriptor,
+		"sanitizeBackticks":                 util.SanitizeBackticks,
+		"inspect":                           util.Inpect,
+		"slice":                             util.Slice,
+		"camelCase":                         util.CamelCase,
+		"lowerFirst":                        util.LowerFirst,
+		"maybeMethodComment":                maybeMethodComment,
+		"maybeMethodParams":                 maybeMethodParams,
+		"maybeMethodResult":                 maybeMethodResult,
+		"maybeFieldComment":                 maybeFieldComment,
 		"getObjects": func(om *types.ObjectMap) []object {
 			keys := om.GetKeys()
 			objects := make([]object, 0, len(keys))
@@ -258,4 +323,39 @@ func WriteFile(box *packr.Box, name, pkg string, openrpc *types.OpenRPCSpec1) er
 	defer file.Close()
 
 	return cfg.Fprint(file, fset, root)
+}
+
+func WriteDocMd(box *packr.Box, name, pkg string, openrpc *types.OpenRPCSpec1) error {
+	data, err := box.Find(fmt.Sprintf("%s.%s", name, goTmplExt))
+	if err != nil {
+		return err
+	}
+
+	tmp, err := template.New(name).Funcs(funcMap(openrpc)).Parse(string(data))
+	if err != nil {
+		return err
+	}
+
+	tmpl := new(bytes.Buffer)
+	err = tmp.Execute(tmpl, openrpc)
+	if err != nil {
+		return err
+	}
+
+	err = os.MkdirAll(pkg, os.ModePerm)
+	if err != nil {
+		return err
+	}
+	file, err := os.OpenFile(path.Join(pkg, fmt.Sprintf("%s.md", name)), os.O_RDWR|os.O_CREATE, 0644)
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+
+	//return cfg.Fprint(file, fset, root)
+	_, err = file.Write(tmpl.Bytes())
+	if err != nil {
+		return err
+	}
+	return nil
 }

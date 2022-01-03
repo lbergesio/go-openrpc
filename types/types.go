@@ -108,6 +108,19 @@ type Link struct {
 	Server      Server                 `json:"server"`
 }
 
+type RequestJson struct {
+	Id      int                    `json:"id"`
+	Jsonrpc string                 `json:"jsonrpc"`
+	Method  string                 `json:"method"`
+	Params  map[string]interface{} `json:"params,omitempty"`
+}
+
+type ResponseJson struct {
+	Id      int         `json:"id"`
+	Jsonrpc string      `json:"jsonrpc"`
+	Result  interface{} `json:"result"`
+}
+
 type Example struct {
 	Name          string      `json:"name"`
 	Summary       string      `json:"summary"`

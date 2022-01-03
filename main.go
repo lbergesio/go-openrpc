@@ -14,9 +14,9 @@ import (
 )
 
 var (
-	pkgDir   string
-	specFile string
-	cliGen   bool
+	pkgDir         string
+	specFile       string
+	cliGen         bool
 	cliCommandName string
 )
 
@@ -62,6 +62,10 @@ func run() error {
 
 	if err = generate.WriteFile(box, "types", pkgDir, openrpc); err != nil {
 		return err
+	}
+
+	if err = generate.WriteDocMd(box, "doc", pkgDir, openrpc); err != nil {
+		return fmt.Errorf("MIERROR %s", err)
 	}
 
 	if cliGen {

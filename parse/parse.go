@@ -68,17 +68,14 @@ func getObjectType(openrpc *types.OpenRPCSpec1, sch spec.Schema) string {
 
 func dereference(openrpc *types.OpenRPCSpec1, name string, sch spec.Schema, om *types.ObjectMap) {
 	// resolve all pointers
-	fmt.Println("PRESTART ", name, sch.Title)
 	fieldName := sch.Title
 	sch = resolveSchema(openrpc, sch)
-	fmt.Println("START ", name, sch.Title, fieldName)
 
 	if len(sch.Properties) > 0 {
 		for key, value := range sch.Properties {
 			value.Title = key
 			dereference(openrpc, sch.Title, value, om)
 		}
-		fmt.Println("PROP ", name, sch.Title, fieldName)
 		om.Set(name, types.BasicType{sch.Description, fieldName, getObjectType(openrpc, sch)})
 		return
 	} else if len(sch.OneOf) > 0 {
@@ -90,10 +87,8 @@ func dereference(openrpc *types.OpenRPCSpec1, name string, sch spec.Schema, om *
 		if sch.Items.Schema != nil {
 			dereference(openrpc, sch.Title, *sch.Items.Schema, om)
 			//dereference(openrpc, name, persistTitleAndDesc(sch, *sch.Items.Schema), om)
-			fmt.Println("ITEMS ", name, sch.Title, fieldName)
 			om.Set(name, types.BasicType{sch.Description, sch.Title, fmt.Sprintf("[]%s", getObjectType(openrpc, persistTitleAndDesc(sch, *sch.Items.Schema)))})
 		} else if len(sch.Items.Schemas) > 0 {
-			fmt.Println("ITEMS2 ", name, sch.Title, fieldName)
 			om.Set(name, types.BasicType{sch.Description, sch.Title, "[]string"})
 		}
 		return
@@ -103,7 +98,6 @@ func dereference(openrpc *types.OpenRPCSpec1, name string, sch spec.Schema, om *
 		return
 	}
 
-	fmt.Println("END ", name, sch.Title, fieldName)
 	om.Set(name, types.BasicType{sch.Description, sch.Title, getConcreteType(sch.Type[0])})
 	return
 }

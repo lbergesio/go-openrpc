@@ -1,0 +1,72 @@
+{{- $components := (.Components) }}
+{{printf .Info.Title}}
+===
+{{printf .Info.Description}}
+
+<strong>Version {{.Info.Version}}</strong>
+
+---
+{{- range .Methods }}
+{{ printf "- [%s](#%s)" .Name .Name }}
+{{- end }}
+---
+
+
+{{- range .Methods }}
+{{ printf "<a name=\"%s\"></a>" .Name }}
+
+{{ printf "## %s" .Name }}
+
+{{ printf .Summary }}
+
+{{ printf "### Description" }}
+{{ printf .Description }}
+
+{{- if .Params }}
+{{ printf "### Parameters" }}
+{{ printf "| Name | Type | Constraints | Description |" }}
+{{ printf "| --- | --- | --- | --- |" }}
+{{- range .Params }}
+{{- $d := (lookupContentDescriptor $components . ).Content }}
+{{- $s := (derefSchema $components $d.Schema).SchemaProps }}
+{{- $type := (index $s.Type 0) }}
+{{ printf "| %s | %s | %s | %s |" $d.Name $type (getConstraints $s) $d.Description }}
+{{- end }}
+{{- end }}
+
+{{- if .Result }}
+{{ printf "### Result" }}
+{{ printf "| Name | Type | Constraints | Description |" }}
+{{ printf "| --- | --- | --- | --- |" }}
+{{- $d := (lookupContentDescriptor $components .Result ).Content }}
+{{- $s := (derefSchema $components $d.Schema).SchemaProps }}
+{{- $type := (index $s.Type 0) }}
+{{ printf "| %s | %s | %s | %s |" $d.Name $type (getConstraints $s) $d.Description }}
+{{- end }}
+
+{{- if .Errors }}
+{{ printf "### Errors" }}
+{{ printf "| Code | Message | Description |" }}
+{{ printf "| --- | --- | --- |" }}
+{{- range .Errors }}
+{{ printf "| %d | %s | %s |" .Code .Message .Data.String }}
+{{- end }}
+{{- end }}
+
+{{- if .Examples }}
+### Examples
+
+#### Request
+
+{{ printf "```json" }}
+{{ printf "%s" (methodExampleRequestAsJSONPretty .) }}
+{{ printf "```" }}
+
+#### Response
+
+{{ printf "```json" }}
+{{ printf "%s" (methodExampleResponseAsJSONPretty .) }}
+{{ printf "```" }}
+{{- end }}
+
+{{- end }}

@@ -27,10 +27,7 @@
 {{ printf "| Name | Type | Constraints | Description |" }}
 {{ printf "| --- | --- | --- | --- |" }}
 {{- range .Params }}
-{{- $d := (lookupContentDescriptor $components . ).Content }}
-{{- $s := (derefSchema $components $d.Schema).SchemaProps }}
-{{- $type := (index $s.Type 0) }}
-{{ printf "| %s | %s | %s | %s |" $d.Name $type (getConstraints $s) $d.Description }}
+{{ printf (getNestedParams $components .) }}
 {{- end }}
 {{- end }}
 
@@ -38,13 +35,7 @@
 {{ printf "### Result" }}
 {{ printf "| Name | Type | Constraints | Description |" }}
 {{ printf "| --- | --- | --- | --- |" }}
-{{- $d := (lookupContentDescriptor $components .Result ).Content }}
-{{- $s := (derefSchema $components $d.Schema).SchemaProps }}
-{{- $type := "" }}
-{{- if gt (len $s.Type) 0 }}
-{{- $type = (index $s.Type 0) }}
-{{- end }}
-{{ printf "| %s | %s | %s | %s |" $d.Name $type (getConstraints $s) $d.Description }}
+{{ printf (getNestedParams $components .Result) }}
 {{- end }}
 
 {{- if .Errors }}

@@ -243,6 +243,54 @@ type object struct {
 	Fields *types.FieldMap
 }
 
+func getNestedParam(parentName string, parentSch spec.Schema) string {
+	s := ""
+	for name, sch := range parentSch.Properties {
+		props := sch.SchemaProps
+		ptype := ""
+		if len(props.Type) > 0 {
+			ptype = props.Type[0]
+		}
+		connector := parentName
+		if !util.IsRequired(parentSch.Required, name) {
+			connector += "?"
+		}
+		connector += "." + name
+		s += "\n" + fmt.Sprintf("| %s | %s |%s | %s |", connector, ptype, getConstraints(props), sch.Description)
+		s += getNestedParam(connector, sch)
+	}
+	if parentSch.Items == nil {
+		return s
+	}
+	if parentSch.Items.Len() > 1 {
+		for _, sv := range parentSch.Items.Schemas {
+			connector := parentName + "[]"
+			s += getNestedParam(connector, sv)
+		}
+	} else {
+		connector := parentName + "[]"
+		s += getNestedParam(connector, *parentSch.Items.Schema)
+	}
+	return s
+}
+
+func getNestedParams(cmpnts *types.Components, cd *types.ContentDescriptor) string {
+	cd, err := maybeLookupComponentsContentDescriptor(cmpnts, cd)
+	if err != nil {
+		return ""
+	}
+	content := cd.Content
+	sch := derefSchemaRecurse(cmpnts, content.Schema)
+	props := sch.SchemaProps
+	ptype := ""
+	if len(props.Type) > 0 {
+		ptype = props.Type[0]
+	}
+	s := fmt.Sprintf("| %s | %s | %s | %s |", content.Name, ptype, getConstraints(props), content.Description)
+	s += getNestedParam(content.Name, sch)
+	return s
+}
+
 func funcMap(openrpc *types.OpenRPCSpec1) template.FuncMap {
 	return template.FuncMap{
 		"programName":                       getProgramName,
@@ -251,7 +299,7 @@ func funcMap(openrpc *types.OpenRPCSpec1) template.FuncMap {
 		"schemaAsJSONPretty":                schemaAsJSONPretty,
 		"methodExampleRequestAsJSONPretty":  methodExampleRequestAsJSONPretty,
 		"methodExampleResponseAsJSONPretty": methodExampleResponseAsJSONPretty,
-		"getConstraints":                    getConstraints,
+		"getNestedParams":                   getNestedParams,
 		"lookupContentDescriptor":           maybeLookupComponentsContentDescriptor,
 		"sanitizeBackticks":                 util.SanitizeBackticks,
 		"inspect":                           util.Inpect,

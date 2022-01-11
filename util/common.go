@@ -52,3 +52,12 @@ func FirstOf(opts ...string) string {
 	}
 	return ""
 }
+
+func IsRequired(r []string, e string) bool {
+	for _, a := range r {
+		if a == e {
+			return true
+		}
+	}
+	return false
+}

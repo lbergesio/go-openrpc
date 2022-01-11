@@ -61,7 +61,12 @@ func getConstraints(p spec.SchemaProps) string {
 		if i != 0 && s != "" {
 			s += "; "
 		}
-		s += fmt.Sprintf("%s:\"%v\"", util.LowerFirst(f), fval)
+		if reflect.ValueOf(fval).Kind() == reflect.Ptr {
+			val := reflect.Indirect(reflect.ValueOf(fval))
+			s += fmt.Sprintf("%s:\"%v\"", util.LowerFirst(f), val)
+		} else {
+			s += fmt.Sprintf("%s:\"%v\"", util.LowerFirst(f), fval)
+		}
 	}
 	return s
 }

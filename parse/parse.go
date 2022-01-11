@@ -49,6 +49,8 @@ func getConcreteType(in string) string {
 	switch in {
 	case reflect.Bool.String(), "boolean":
 		return reflect.Bool.String()
+	case reflect.Uint.String(), "uint":
+		return reflect.Uint.String()
 	case reflect.Int.String(), "integer":
 		return reflect.Int.String()
 	default:
@@ -66,6 +68,13 @@ func getObjectType(openrpc *types.OpenRPCSpec1, sch spec.Schema) string {
 	return getConcreteType(sch.Type[0])
 }
 
+func dealWithOwnObjectTypes(fieldName string, sch spec.Schema) types.BasicType {
+	if sch.Title == "uint" {
+		return types.BasicType{sch.Description, fieldName, getConcreteType(sch.Title)}
+	}
+	return types.BasicType{sch.Description, sch.Title, getConcreteType(sch.Type[0])}
+}
+
 func dereference(openrpc *types.OpenRPCSpec1, name string, sch spec.Schema, om *types.ObjectMap) {
 	// resolve all pointers
 	fieldName := sch.Title
@@ -81,7 +90,7 @@ func dereference(openrpc *types.OpenRPCSpec1, name string, sch spec.Schema, om *
 	} else if len(sch.OneOf) > 0 {
 		next := sch.OneOf[0]
 		dereference(openrpc, sch.Title, next, om)
-		om.Set(name, types.BasicType{sch.Description, sch.Title, getObjectType(openrpc, resolveSchema(openrpc, next))})
+		om.Set(name, types.BasicType{sch.Description, fieldName, getObjectType(openrpc, resolveSchema(openrpc, next))})
 		return
 	} else if sch.Items != nil {
 		if sch.Items.Schema != nil {
@@ -89,7 +98,7 @@ func dereference(openrpc *types.OpenRPCSpec1, name string, sch spec.Schema, om *
 			//dereference(openrpc, name, persistTitleAndDesc(sch, *sch.Items.Schema), om)
 			om.Set(name, types.BasicType{sch.Description, sch.Title, fmt.Sprintf("[]%s", getObjectType(openrpc, persistTitleAndDesc(sch, *sch.Items.Schema)))})
 		} else if len(sch.Items.Schemas) > 0 {
-			om.Set(name, types.BasicType{sch.Description, sch.Title, "[]string"})
+			om.Set(name, types.BasicType{sch.Description, fieldName, "[]string"})
 		}
 		return
 	}
@@ -98,7 +107,7 @@ func dereference(openrpc *types.OpenRPCSpec1, name string, sch spec.Schema, om *
 		return
 	}
 
-	om.Set(name, types.BasicType{sch.Description, sch.Title, getConcreteType(sch.Type[0])})
+	om.Set(name, dealWithOwnObjectTypes(fieldName, sch))
 	return
 }
 

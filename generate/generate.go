@@ -66,13 +66,8 @@ func getConstraints(p spec.SchemaProps) string {
 	return s
 }
 
-func methodExampleRequestAsJSONPretty(m types.Method) string {
-	if len(m.Examples) == 0 {
-		return ""
-	}
-
+func methodExampleRequestAsJSONPretty(method string, ex types.ExamplePairing) string {
 	params := make(map[string]interface{})
-	ex := m.Examples[0]
 	for _, p := range ex.Params {
 		params[p.Name] = p.Value
 	}
@@ -80,7 +75,7 @@ func methodExampleRequestAsJSONPretty(m types.Method) string {
 	r := types.RequestJson{
 		Id:      1,
 		Jsonrpc: "2.0.0",
-		Method:  m.Name,
+		Method:  method,
 		Params:  params,
 	}
 
@@ -91,12 +86,7 @@ func methodExampleRequestAsJSONPretty(m types.Method) string {
 	return string(j)
 }
 
-func methodExampleResponseAsJSONPretty(m types.Method) string {
-	if len(m.Examples) == 0 {
-		return ""
-	}
-
-	ex := m.Examples[0]
+func methodExampleResponseAsJSONPretty(ex types.ExamplePairing) string {
 	r := types.ResponseJson{
 		Id:      1,
 		Jsonrpc: "2.0.0",

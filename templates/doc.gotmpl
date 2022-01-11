@@ -14,7 +14,7 @@
 
 {{- range .Methods }}
 {{ printf "<a name=\"%s\"></a>" .Name }}
-
+{{- $methodName := (.Name) }}
 {{ printf "## %s" .Name }}
 
 {{ printf .Summary }}
@@ -50,10 +50,14 @@
 {{- if .Examples }}
 ### Examples
 
+{{- range .Examples }}
+{{ printf "#### %s" .Name }}
+{{ printf "%s" .Description }}
+
 #### Request
 
 {{ printf "```json" }}
-{{ printf "%s" (methodExampleRequestAsJSONPretty .) }}
+{{ printf "%s" (methodExampleRequestAsJSONPretty $methodName .) }}
 {{ printf "```" }}
 
 #### Response
@@ -61,6 +65,8 @@
 {{ printf "```json" }}
 {{ printf "%s" (methodExampleResponseAsJSONPretty .) }}
 {{ printf "```" }}
+{{- end }}
+
 {{- end }}
 
 {{- end }}

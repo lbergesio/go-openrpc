@@ -40,7 +40,10 @@
 {{ printf "| --- | --- | --- | --- |" }}
 {{- $d := (lookupContentDescriptor $components .Result ).Content }}
 {{- $s := (derefSchema $components $d.Schema).SchemaProps }}
-{{- $type := (index $s.Type 0) }}
+{{- $type := "" }}
+{{- if gt (len $s.Type) 0 }}
+{{- $type = (index $s.Type 0) }}
+{{- end }}
 {{ printf "| %s | %s | %s | %s |" $d.Name $type (getConstraints $s) $d.Description }}
 {{- end }}
 

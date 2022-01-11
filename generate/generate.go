@@ -61,7 +61,12 @@ func getConstraints(p spec.SchemaProps) string {
 		if i != 0 && s != "" {
 			s += "; "
 		}
-		if reflect.ValueOf(fval).Kind() == reflect.Ptr {
+		if f == "Pattern" {
+			if val, ok := fval.(string); ok {
+				val := strings.Replace(val, "|", "\\|", -1)
+				s += fmt.Sprintf("%s:\"%v\"", util.LowerFirst(f), val)
+			}
+		} else if reflect.ValueOf(fval).Kind() == reflect.Ptr {
 			val := reflect.Indirect(reflect.ValueOf(fval))
 			s += fmt.Sprintf("%s:\"%v\"", util.LowerFirst(f), val)
 		} else {

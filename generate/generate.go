@@ -51,11 +51,16 @@ func schemaAsJSONPretty(s spec.Schema) string {
 
 func getConstraints(p spec.SchemaProps) string {
 	s := ""
-	fields := []string{"Format", "Maximum", "Minimum", "Pattern"}
+	fields := []string{"Format", "Maximum", "Minimum", "Pattern", "Enum"}
 	e := reflect.ValueOf(&p).Elem()
 	for i, f := range fields {
 		fval := e.FieldByName(f).Interface()
-		if fval == reflect.Zero(reflect.TypeOf(fval)).Interface() {
+		if f == "Enum" {
+			if reflect.ValueOf(fval).Len() > 0 {
+				s += fmt.Sprintf("%s:\"%v\"", util.LowerFirst(f), fval[0])
+			}
+			continue
+		} else if fval == reflect.Zero(reflect.TypeOf(fval)).Interface() {
 			continue
 		}
 		if i != 0 && s != "" {

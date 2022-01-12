@@ -265,10 +265,27 @@ func getNestedParam(parentName string, parentSch spec.Schema) string {
 	if parentSch.Items.Len() > 1 {
 		for _, sv := range parentSch.Items.Schemas {
 			connector := parentName + "[]"
+			if sv.Items == nil {
+				props := sv.SchemaProps
+				ptype := ""
+				if len(props.Type) > 0 {
+					ptype = props.Type[0]
+				}
+				s += "\n" + fmt.Sprintf("| %s | %s |%s | %s |", connector, ptype, getConstraints(props), sv.Description)
+			}
 			s += getNestedParam(connector, sv)
 		}
 	} else {
 		connector := parentName + "[]"
+		if parentSch.Items.Schema.Items == nil {
+			csch := *parentSch.Items.Schema
+			props := csch.SchemaProps
+			ptype := ""
+			if len(props.Type) > 0 {
+				ptype = props.Type[0]
+			}
+			s += "\n" + fmt.Sprintf("| %s | %s |%s | %s |", connector, ptype, getConstraints(props), csch.Description)
+		}
 		s += getNestedParam(connector, *parentSch.Items.Schema)
 	}
 	return s

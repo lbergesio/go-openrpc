@@ -1,6 +1,6 @@
 package types
 
-import "github.com/gregdhill/go-openrpc/util"
+import "github.com/lbergesio/go-openrpc/util"
 
 type BasicType struct {
 	Desc string

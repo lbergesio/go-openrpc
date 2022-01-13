@@ -18,8 +18,8 @@ import (
 
 	"github.com/go-openapi/spec"
 	"github.com/gobuffalo/packr/v2"
-	"github.com/gregdhill/go-openrpc/types"
-	"github.com/gregdhill/go-openrpc/util"
+	"github.com/lbergesio/go-openrpc/types"
+	"github.com/lbergesio/go-openrpc/util"
 	"github.com/imdario/mergo"
 )
 

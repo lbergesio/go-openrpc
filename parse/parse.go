@@ -6,8 +6,8 @@ import (
 	"reflect"
 
 	"github.com/go-openapi/spec"
-	"github.com/gregdhill/go-openrpc/types"
-	"github.com/gregdhill/go-openrpc/util"
+	"github.com/lbergesio/go-openrpc/types"
+	"github.com/lbergesio/go-openrpc/util"
 )
 
 const (

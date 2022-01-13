@@ -1,4 +1,4 @@
-module github.com/gregdhill/go-openrpc
+module github.com/lbergesio/go-openrpc
 
 go 1.12
 

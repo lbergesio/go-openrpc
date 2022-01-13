@@ -8,9 +8,9 @@ import (
 	"os"
 
 	"github.com/gobuffalo/packr/v2"
-	"github.com/gregdhill/go-openrpc/generate"
-	"github.com/gregdhill/go-openrpc/parse"
-	"github.com/gregdhill/go-openrpc/types"
+	"github.com/lbergesio/go-openrpc/generate"
+	"github.com/lbergesio/go-openrpc/parse"
+	"github.com/lbergesio/go-openrpc/types"
 )
 
 var (

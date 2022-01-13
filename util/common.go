@@ -17,6 +17,13 @@ func SanitizeBackticks(s string) string {
 	return s
 }
 
+func SanitizeNewLines(s string, comment bool) string {
+	if comment {
+		return strings.ReplaceAll(s, "\\n", "\n// ")
+	}
+	return strings.ReplaceAll(s, "\\n", "\n")
+}
+
 func Slice(val []interface{}, index int) interface{} {
 	return val[index]
 }

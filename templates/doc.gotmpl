@@ -20,7 +20,7 @@
 {{ printf .Summary }}
 
 {{ printf "### Description" }}
-{{ printf .Description }}
+{{ printf (sanitizeNewLines .Description false) }}
 
 {{- if .Params }}
 {{ printf "### Parameters" }}

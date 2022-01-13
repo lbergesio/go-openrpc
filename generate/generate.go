@@ -226,7 +226,7 @@ func maybeMessageResult(message types.Message) string {
 
 func maybeMessageComment(message types.Message) string {
 	if comment := util.FirstOf(message.Description, message.Summary); comment != "" {
-		return fmt.Sprintf("// %s", comment)
+		return fmt.Sprintf("// %s", util.SanitizeNewLines(comment, true))
 	}
 	return ""
 }
@@ -260,7 +260,7 @@ func getNestedParam(parentName string, parentSch spec.Schema) string {
 			connector += "?"
 		}
 		connector += "." + name
-		s += "\n" + fmt.Sprintf("| %s | %s |%s | %s |", connector, ptype, getConstraints(props), sch.Description)
+		s += "\n" + fmt.Sprintf("| %s | %s |%s | %s |", connector, ptype, getConstraints(props), util.SanitizeNewLines(sch.Description, false))
 		s += getNestedParam(connector, sch)
 	}
 	if parentSch.Items == nil {
@@ -275,7 +275,7 @@ func getNestedParam(parentName string, parentSch spec.Schema) string {
 				if len(props.Type) > 0 {
 					ptype = props.Type[0]
 				}
-				s += "\n" + fmt.Sprintf("| %s | %s |%s | %s |", connector, ptype, getConstraints(props), sv.Description)
+				s += "\n" + fmt.Sprintf("| %s | %s |%s | %s |", connector, ptype, getConstraints(props), util.SanitizeNewLines(sv.Description, false))
 			}
 			s += getNestedParam(connector, sv)
 		}
@@ -288,7 +288,7 @@ func getNestedParam(parentName string, parentSch spec.Schema) string {
 			if len(props.Type) > 0 {
 				ptype = props.Type[0]
 			}
-			s += "\n" + fmt.Sprintf("| %s | %s |%s | %s |", connector, ptype, getConstraints(props), csch.Description)
+			s += "\n" + fmt.Sprintf("| %s | %s |%s | %s |", connector, ptype, getConstraints(props), util.SanitizeNewLines(csch.Description, false))
 		}
 		s += getNestedParam(connector, *parentSch.Items.Schema)
 	}
@@ -307,7 +307,7 @@ func getNestedParams(cmpnts *types.Components, cd *types.ContentDescriptor) stri
 	if len(props.Type) > 0 {
 		ptype = props.Type[0]
 	}
-	s := fmt.Sprintf("| %s | %s | %s | %s |", content.Name, ptype, getConstraints(props), content.Description)
+	s := fmt.Sprintf("| %s | %s | %s | %s |", content.Name, ptype, getConstraints(props), util.SanitizeNewLines(content.Description, false))
 	s += getNestedParam(content.Name, sch)
 	return s
 }
@@ -322,6 +322,7 @@ func funcMap(gwmsgs *types.GwMsgSpec1) template.FuncMap {
 		"messageExampleResponseAsJSONPretty": messageExampleResponseAsJSONPretty,
 		"getNestedParams":                    getNestedParams,
 		"lookupContentDescriptor":            maybeLookupComponentsContentDescriptor,
+		"sanitizeNewLines":                   util.SanitizeNewLines,
 		"sanitizeBackticks":                  util.SanitizeBackticks,
 		"inspect":                            util.Inpect,
 		"slice":                              util.Slice,

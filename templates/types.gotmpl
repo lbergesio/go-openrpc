@@ -16,7 +16,7 @@ type GwService interface {
 {{- if $result }}
 {{- $message = printf "%s (*%s, error)" $message $result }}
 {{- else }}
-{{- $message = printf "%s error" $message $result }}
+{{- $message = printf "%s error" $message }}
 {{- end }}
 {{ maybeMessageComment . }}
 {{ printf "%s" $message }}

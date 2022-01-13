@@ -18,9 +18,9 @@ import (
 
 	"github.com/go-openapi/spec"
 	"github.com/gobuffalo/packr/v2"
+	"github.com/imdario/mergo"
 	"github.com/lbergesio/go-openrpc/types"
 	"github.com/lbergesio/go-openrpc/util"
-	"github.com/imdario/mergo"
 )
 
 const (

@@ -60,11 +60,14 @@
 {{ printf "%s" (messageExampleRequestAsJSONPretty $messageName .) }}
 {{ printf "```" }}
 
+{{- if .Result.Value }}
 #### Response
 
 {{ printf "```json" }}
 {{ printf "%s" (messageExampleResponseAsJSONPretty $messageName .) }}
 {{ printf "```" }}
+{{- end }}
+
 {{- end }}
 
 {{- end }}

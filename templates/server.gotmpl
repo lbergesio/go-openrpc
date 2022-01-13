@@ -75,7 +75,7 @@ func (c Code) RPCErrorWithMessage(msg string) *RPCError {
 // https://www.jsonrpc.org/specification#request_object
 type RPCRequest struct {
 	JSONRPC string          `json:"jsonrpc"`
-	Method  string          `json:"method"`
+	Message  string          `json:"message"`
 	Params  json.RawMessage `json:"params"`
 	ID      interface{}    	`json:"id"`
 }
@@ -193,15 +193,15 @@ func StructToResult(in interface{}) interface{} {
 }
 
 func (srv *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	if r.Method == http.MethodOptions {
+	if r.Message == http.MessageOptions {
 		w.Header().Set("Access-Control-Allow-Origin", "*")
-		w.Header().Set("Access-Control-Allow-Methods", "POST, OPTIONS, GET")
+		w.Header().Set("Access-Control-Allow-Messages", "POST, OPTIONS, GET")
 		w.Header().Set("Access-Control-Allow-Headers", "DNT,X-CustomHeader,Keep-Alive,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Content-Range,Range")
 		w.Header().Set("Accept-Range", "bytes")
 		w.WriteHeader(http.StatusOK)
 		w.Write([]byte{})
 		return
-	} else if r.Method != http.MethodPost {
+	} else if r.Message != http.MessagePost {
 		WriteError(w, "", ErrInternal.RPCError())
 		return
 	}
@@ -220,19 +220,19 @@ func (srv *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if in.JSONRPC != JSONRPC || in.Method == "" || in.ID == nil {
+	if in.JSONRPC != JSONRPC || in.Message == "" || in.ID == nil {
 		WriteError(w, nil, ErrInvalidParams.RPCError())
 		return
 	}
 
 	var out interface{}
 
-	switch in.Method {
-	{{- range .Methods }}
+	switch in.Message {
+	{{- range .Messages }}
 	case "{{ .Name }}":
 	{{- $name := .Name | camelCase }}
-	{{- $params := maybeMethodParams . }}
-	{{- $result := maybeMethodResult . }}
+	{{- $params := maybeMessageParams . }}
+	{{- $result := maybeMessageResult . }}
 
 	{{- if $params }}
 		req := new({{ $params }})

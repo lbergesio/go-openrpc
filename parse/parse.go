@@ -113,7 +113,7 @@ func dereference(openrpc *types.OpenRPCSpec1, name string, sch spec.Schema, om *
 
 // GetTypes constructs all possible type definitions from the spec
 func GetTypes(openrpc *types.OpenRPCSpec1, om *types.ObjectMap) {
-	for _, m := range openrpc.Methods {
+	for _, m := range openrpc.Messages {
 		name := fmt.Sprintf("%s%s", util.CamelCase(m.Name), params)
 		for _, param := range m.Params {
 			sch := param.Schema

@@ -57,7 +57,7 @@ func getConstraints(p spec.SchemaProps) string {
 		fval := e.FieldByName(f).Interface()
 		if f == "Enum" {
 			if reflect.ValueOf(fval).Len() > 0 {
-				s += fmt.Sprintf("%s:\"%v\"", util.LowerFirst(f), fval[0])
+				s += fmt.Sprintf("%s:\"%v\"", util.LowerFirst(f), fval)
 			}
 			continue
 		} else if fval == reflect.Zero(reflect.TypeOf(fval)).Interface() {
@@ -81,7 +81,7 @@ func getConstraints(p spec.SchemaProps) string {
 	return s
 }
 
-func methodExampleRequestAsJSONPretty(method string, ex types.ExamplePairing) string {
+func messageExampleRequestAsJSONPretty(message string, ex types.ExamplePairing) string {
 	params := make(map[string]interface{})
 	for _, p := range ex.Params {
 		params[p.Name] = p.Value
@@ -90,7 +90,7 @@ func methodExampleRequestAsJSONPretty(method string, ex types.ExamplePairing) st
 	r := types.RequestJson{
 		Id:      1,
 		Jsonrpc: "2.0.0",
-		Method:  method,
+		Message: message,
 		Params:  params,
 	}
 
@@ -101,7 +101,7 @@ func methodExampleRequestAsJSONPretty(method string, ex types.ExamplePairing) st
 	return string(j)
 }
 
-func methodExampleResponseAsJSONPretty(ex types.ExamplePairing) string {
+func messageExampleResponseAsJSONPretty(ex types.ExamplePairing) string {
 	r := types.ResponseJson{
 		Id:      1,
 		Jsonrpc: "2.0.0",
@@ -211,22 +211,22 @@ func getSchemaFromRef(cmpnts *types.Components, ref spec.Ref) (sch spec.Schema) 
 	return
 }
 
-func maybeMethodParams(method types.Method) string {
-	if len(method.Params) > 0 {
-		return fmt.Sprintf("%s%s", util.CamelCase(method.Name), params)
+func maybeMessageParams(message types.Message) string {
+	if len(message.Params) > 0 {
+		return fmt.Sprintf("%s%s", util.CamelCase(message.Name), params)
 	}
 	return ""
 }
 
-func maybeMethodResult(method types.Method) string {
-	if method.Result != nil {
-		return fmt.Sprintf("%s%s", util.CamelCase(method.Name), result)
+func maybeMessageResult(message types.Message) string {
+	if message.Result != nil {
+		return fmt.Sprintf("%s%s", util.CamelCase(message.Name), result)
 	}
 	return ""
 }
 
-func maybeMethodComment(method types.Method) string {
-	if comment := util.FirstOf(method.Description, method.Summary); comment != "" {
+func maybeMessageComment(message types.Message) string {
+	if comment := util.FirstOf(message.Description, message.Summary); comment != "" {
 		return fmt.Sprintf("// %s", comment)
 	}
 	return ""
@@ -315,23 +315,23 @@ func getNestedParams(cmpnts *types.Components, cd *types.ContentDescriptor) stri
 
 func funcMap(openrpc *types.OpenRPCSpec1) template.FuncMap {
 	return template.FuncMap{
-		"programName":                       getProgramName,
-		"derefSchema":                       derefSchemaRecurse,
-		"schemaHasRef":                      schemaHazRef,
-		"schemaAsJSONPretty":                schemaAsJSONPretty,
-		"methodExampleRequestAsJSONPretty":  methodExampleRequestAsJSONPretty,
-		"methodExampleResponseAsJSONPretty": methodExampleResponseAsJSONPretty,
-		"getNestedParams":                   getNestedParams,
-		"lookupContentDescriptor":           maybeLookupComponentsContentDescriptor,
-		"sanitizeBackticks":                 util.SanitizeBackticks,
-		"inspect":                           util.Inpect,
-		"slice":                             util.Slice,
-		"camelCase":                         util.CamelCase,
-		"lowerFirst":                        util.LowerFirst,
-		"maybeMethodComment":                maybeMethodComment,
-		"maybeMethodParams":                 maybeMethodParams,
-		"maybeMethodResult":                 maybeMethodResult,
-		"maybeFieldComment":                 maybeFieldComment,
+		"programName":                        getProgramName,
+		"derefSchema":                        derefSchemaRecurse,
+		"schemaHasRef":                       schemaHazRef,
+		"schemaAsJSONPretty":                 schemaAsJSONPretty,
+		"messageExampleRequestAsJSONPretty":  messageExampleRequestAsJSONPretty,
+		"messageExampleResponseAsJSONPretty": messageExampleResponseAsJSONPretty,
+		"getNestedParams":                    getNestedParams,
+		"lookupContentDescriptor":            maybeLookupComponentsContentDescriptor,
+		"sanitizeBackticks":                  util.SanitizeBackticks,
+		"inspect":                            util.Inpect,
+		"slice":                              util.Slice,
+		"camelCase":                          util.CamelCase,
+		"lowerFirst":                         util.LowerFirst,
+		"maybeMessageComment":                maybeMessageComment,
+		"maybeMessageParams":                 maybeMessageParams,
+		"maybeMessageResult":                 maybeMessageResult,
+		"maybeFieldComment":                  maybeFieldComment,
 		"getObjects": func(om *types.ObjectMap) []object {
 			keys := om.GetKeys()
 			objects := make([]object, 0, len(keys))

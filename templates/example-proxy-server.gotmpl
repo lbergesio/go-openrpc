@@ -47,23 +47,23 @@ var gethClientRPC string
 
 type exampleRPCService struct{}
 
-{{- range .Methods }}
+{{- range .Messages }}
 {{- $name := .Name | camelCase }}
-{{- $params := (maybeMethodParams .) }}
-{{- $result := (maybeMethodResult .) }}
-{{- $method := printf "%s" $name }}
-{{- $original_method := printf "%s" $name }}
+{{- $params := (maybeMessageParams .) }}
+{{- $result := (maybeMessageResult .) }}
+{{- $message := printf "%s" $name }}
+{{- $original_message := printf "%s" $name }}
 {{- if $params }}
-{{- $method = printf "%s(params *rpct.%s)" $method $params }}
+{{- $message = printf "%s(params *rpct.%s)" $message $params }}
 {{- else }}
-{{- $method = printf "%s()" $method }}
+{{- $message = printf "%s()" $message }}
 {{- end }}
 {{- if $result }}
-{{- $method = printf "%s (result *rpct.%s, err error)" $method $result }}
+{{- $message = printf "%s (result *rpct.%s, err error)" $message $result }}
 {{- else }}
-{{- $method = printf "%s error" $method $result }}
+{{- $message = printf "%s error" $message $result }}
 {{- end }}
-{{ printf "func (s *exampleRPCService) %s {" $method }}
+{{ printf "func (s *exampleRPCService) %s {" $message }}
 {{- if $params }}
 {{ printf "defer log.Println(\"%s\", \"params=\", params)" .Name }}
 {{- end }}
@@ -71,7 +71,7 @@ type exampleRPCService struct{}
 
 req := rpct.RPCRequest{
 		JSONRPC: "2.0",
-		Method:  "{{ .Name }}",
+		Message:  "{{ .Name }}",
 		Params:  []byte("[]"),
 		ID:      1,
 	}

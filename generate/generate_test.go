@@ -13,7 +13,7 @@ import (
 )
 
 var exp = `package generate
-type ServiceMethodParams struct {
+type ServiceMessageParams struct {
 // this is a desc
 Param1 string
 // this is a desc
@@ -29,7 +29,7 @@ Foo string
 // this is a bar
 Bar string
 }
-type ServiceMethodResult struct {
+type ServiceMessageResult struct {
 // the requested data
 Data string
 }

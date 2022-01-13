@@ -103,7 +103,7 @@ type Link struct {
 	Name        string                 `json:"name"`
 	Description string                 `json:"description"`
 	Summary     string                 `json:"summary"`
-	Method      string                 `json:"method"`
+	Message     string                 `json:"message"`
 	Params      map[string]interface{} `json:"params"`
 	Server      Server                 `json:"server"`
 }
@@ -111,7 +111,7 @@ type Link struct {
 type RequestJson struct {
 	Id      int                    `json:"id"`
 	Jsonrpc string                 `json:"jsonrpc"`
-	Method  string                 `json:"method"`
+	Message string                 `json:"message"`
 	Params  map[string]interface{} `json:"params,omitempty"`
 }
 
@@ -137,7 +137,7 @@ type ExamplePairing struct {
 	Result      Example   `json:"result"`
 }
 
-type Method struct {
+type Message struct {
 	Name           string               `json:"name"`
 	Tags           []Tag                `json:"tags"`
 	Summary        string               `json:"summary"`
@@ -167,7 +167,7 @@ type OpenRPCSpec1 struct {
 	OpenRPC      string       `json:"openrpc"`
 	Info         Info         `json:"info"`
 	Servers      []Server     `json:"servers"`
-	Methods      []Method     `json:"methods"`
+	Messages     []Message    `json:"messages"`
 	Components   Components   `json:"components"`
 	ExternalDocs ExternalDocs `json:"externalDocs"`
 
@@ -176,8 +176,8 @@ type OpenRPCSpec1 struct {
 
 func NewOpenRPCSpec1() *OpenRPCSpec1 {
 	return &OpenRPCSpec1{
-		Servers: make([]Server, 0),
-		Methods: make([]Method, 0),
+		Servers:  make([]Server, 0),
+		Messages: make([]Message, 0),
 
 		Objects: NewObjectMap(),
 	}

@@ -5,10 +5,10 @@
       "title": "JSON-RPC",
       "description": "This is a test OpenRPC spec"
     },
-    "methods": [
+    "messages": [
       {
-        "name": "service_method",
-        "description": "returns the method of this service",
+        "name": "service_message",
+        "description": "returns the message of this service",
         "summary": "current service",
         "params": [
           {

@@ -6,15 +6,15 @@
 <strong>Version {{.Info.Version}}</strong>
 
 ---
-{{- range .Methods }}
+{{- range .Messages }}
 {{ printf "- [%s](#%s)" .Name .Name }}
 {{- end }}
 ---
 
 
-{{- range .Methods }}
+{{- range .Messages }}
 {{ printf "<a name=\"%s\"></a>" .Name }}
-{{- $methodName := (.Name) }}
+{{- $messageName := (.Name) }}
 {{ printf "## %s" .Name }}
 
 {{ printf .Summary }}
@@ -57,13 +57,13 @@
 #### Request
 
 {{ printf "```json" }}
-{{ printf "%s" (methodExampleRequestAsJSONPretty $methodName .) }}
+{{ printf "%s" (messageExampleRequestAsJSONPretty $messageName .) }}
 {{ printf "```" }}
 
 #### Response
 
 {{ printf "```json" }}
-{{ printf "%s" (methodExampleResponseAsJSONPretty .) }}
+{{ printf "%s" (messageExampleResponseAsJSONPretty .) }}
 {{ printf "```" }}
 {{- end }}
 

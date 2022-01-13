@@ -9,7 +9,7 @@
         "url": "https://www.apache.org/licenses/LICENSE-2.0.html"
       }
     },
-    "methods": [
+    "messages": [
       {
         "name": "web3_clientVersion",
         "description": "Returns the version of the current client",
@@ -376,7 +376,7 @@
       },
       {
         "name": "eth_getFilterChanges",
-        "summary": "Polling method for a filter, which returns an array of logs which occurred since last poll.",
+        "summary": "Polling message for a filter, which returns an array of logs which occurred since last poll.",
         "params": [
           {
             "name": "filterId",
@@ -945,7 +945,7 @@
       },
       {
         "name": "eth_sign",
-        "summary": "The sign method calculates an Ethereum specific signature.",
+        "summary": "The sign message calculates an Ethereum specific signature.",
         "deprecated": true,
         "params": [
           {

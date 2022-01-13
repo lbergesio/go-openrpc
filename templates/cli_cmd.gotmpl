@@ -65,7 +65,7 @@ var errJSONRPC = errors.New("json rpc did return error")
 func makeJSONRPCRequest(name string, params []byte) ([]byte, error) {
     reqBody := rpct.RPCRequest{
         JSONRPC: "2.0",
-        Method: name,
+        Message: name,
         Params: params,
         ID: os.Getpid(), // TODO
     }
@@ -184,7 +184,7 @@ func marshalParams(params []string) ([]byte, error) {
 }
 
 {{ $components := .Components }}
-{{ range .Methods }}
+{{ range .Messages }}
 
 {{ $paramsLength := (len .Params) }}
 
@@ -217,7 +217,7 @@ For more information see {{- printf "%s" .ExternalDocs.Description }}: {{- print
     {{if .Deprecated -}}
     Deprecated: "DEPRECATED: Use at your own risk.",
     PreRun: func(cmd *cobra.Command, args []string) {
-        log.Println("WARNING: This method ({{.Name}}) is deprecated. Use at your own risk.")
+        log.Println("WARNING: This message ({{.Name}}) is deprecated. Use at your own risk.")
     },
     {{- end }}
     Run: func(cmd *cobra.Command, args []string) {
@@ -267,7 +267,7 @@ func init() {
   rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 
   rootCmd.AddCommand(completionCmd)
-{{- range .Methods }}
+{{- range .Messages }}
   rootCmd.AddCommand({{.Name | camelCase | lowerFirst }}Cmd)
 {{- end }}
 }

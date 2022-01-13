@@ -3,23 +3,23 @@
 package main
 
 type GoOpenRPCService interface {
-{{- range .Methods }}
+{{- range .Messages }}
 {{- $name := .Name | camelCase }}
-{{- $params := (maybeMethodParams .) }}
-{{- $result := (maybeMethodResult .) }}
-{{- $method := printf "%s" $name }}
+{{- $params := (maybeMessageParams .) }}
+{{- $result := (maybeMessageResult .) }}
+{{- $message := printf "%s" $name }}
 {{- if $params }}
-{{- $method = printf "%s(*%s)" $method $params }}
+{{- $message = printf "%s(*%s)" $message $params }}
 {{- else }}
-{{- $method = printf "%s()" $method }}
+{{- $message = printf "%s()" $message }}
 {{- end }}
 {{- if $result }}
-{{- $method = printf "%s (*%s, error)" $method $result }}
+{{- $message = printf "%s (*%s, error)" $message $result }}
 {{- else }}
-{{- $method = printf "%s error" $method $result }}
+{{- $message = printf "%s error" $message $result }}
 {{- end }}
-{{ maybeMethodComment . }}
-{{ printf "%s" $method }}
+{{ maybeMessageComment . }}
+{{ printf "%s" $message }}
 {{- end }}
 }
 

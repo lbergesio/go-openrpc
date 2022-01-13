@@ -313,7 +313,7 @@ func getNestedParams(cmpnts *types.Components, cd *types.ContentDescriptor) stri
 	return s
 }
 
-func funcMap(openrpc *types.OpenRPCSpec1) template.FuncMap {
+func funcMap(gwmsgs *types.GwMsgSpec1) template.FuncMap {
 	return template.FuncMap{
 		"programName":                        getProgramName,
 		"derefSchema":                        derefSchemaRecurse,
@@ -355,19 +355,19 @@ func funcMap(openrpc *types.OpenRPCSpec1) template.FuncMap {
 	}
 }
 
-func WriteFile(box *packr.Box, name, pkg string, openrpc *types.OpenRPCSpec1) error {
+func WriteFile(box *packr.Box, name, pkg string, gwmsgs *types.GwMsgSpec1) error {
 	data, err := box.Find(fmt.Sprintf("%s.%s", name, goTmplExt))
 	if err != nil {
 		return err
 	}
 
-	tmp, err := template.New(name).Funcs(funcMap(openrpc)).Parse(string(data))
+	tmp, err := template.New(name).Funcs(funcMap(gwmsgs)).Parse(string(data))
 	if err != nil {
 		return err
 	}
 
 	tmpl := new(bytes.Buffer)
-	err = tmp.Execute(tmpl, openrpc)
+	err = tmp.Execute(tmpl, gwmsgs)
 	if err != nil {
 		return err
 	}
@@ -395,19 +395,19 @@ func WriteFile(box *packr.Box, name, pkg string, openrpc *types.OpenRPCSpec1) er
 	return cfg.Fprint(file, fset, root)
 }
 
-func WriteDocMd(box *packr.Box, name, pkg string, openrpc *types.OpenRPCSpec1) error {
+func WriteDocMd(box *packr.Box, name, pkg string, gwmsgs *types.GwMsgSpec1) error {
 	data, err := box.Find(fmt.Sprintf("%s.%s", name, goTmplExt))
 	if err != nil {
 		return err
 	}
 
-	tmp, err := template.New(name).Funcs(funcMap(openrpc)).Parse(string(data))
+	tmp, err := template.New(name).Funcs(funcMap(gwmsgs)).Parse(string(data))
 	if err != nil {
 		return err
 	}
 
 	tmpl := new(bytes.Buffer)
-	err = tmp.Execute(tmpl, openrpc)
+	err = tmp.Execute(tmpl, gwmsgs)
 	if err != nil {
 		return err
 	}

@@ -12,7 +12,7 @@ import (
 func TestParse(t *testing.T) {
 	data, err := ioutil.ReadFile("testdata/eth_openrpc.json")
 	require.NoError(t, err)
-	spec := types.NewOpenRPCSpec1()
+	spec := types.NewGwMsgSpec1()
 	err = json.Unmarshal(data, spec)
 	require.NoError(t, err)
 	GetTypes(spec, spec.Objects)

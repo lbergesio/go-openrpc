@@ -30,8 +30,8 @@ func persistFields(prev, next spec.Schema) spec.Schema {
 	return next
 }
 
-func resolveSchema(openrpc *types.OpenRPCSpec1, sch spec.Schema) spec.Schema {
-	doc, _, _ := sch.Ref.GetPointer().Get(openrpc)
+func resolveSchema(gwmsgs *types.GwMsgSpec1, sch spec.Schema) spec.Schema {
+	doc, _, _ := sch.Ref.GetPointer().Get(gwmsgs)
 
 	if s, ok := doc.(spec.Schema); ok {
 		sch = persistFields(sch, s)
@@ -40,7 +40,7 @@ func resolveSchema(openrpc *types.OpenRPCSpec1, sch spec.Schema) spec.Schema {
 	}
 
 	if sch.Ref.GetURL() != nil {
-		return resolveSchema(openrpc, sch)
+		return resolveSchema(gwmsgs, sch)
 	}
 	return sch
 }
@@ -58,8 +58,8 @@ func getConcreteType(in string) string {
 	}
 }
 
-func getObjectType(openrpc *types.OpenRPCSpec1, sch spec.Schema) string {
-	sch = resolveSchema(openrpc, sch)
+func getObjectType(gwmsgs *types.GwMsgSpec1, sch spec.Schema) string {
+	sch = resolveSchema(gwmsgs, sch)
 
 	if len(sch.Properties) > 0 || len(sch.Type) < 1 {
 		return util.CamelCase(sch.Title)
@@ -75,28 +75,28 @@ func dealWithOwnObjectTypes(fieldName string, sch spec.Schema) types.BasicType {
 	return types.BasicType{sch.Description, sch.Title, getConcreteType(sch.Type[0])}
 }
 
-func dereference(openrpc *types.OpenRPCSpec1, name string, sch spec.Schema, om *types.ObjectMap) {
+func dereference(gwmsgs *types.GwMsgSpec1, name string, sch spec.Schema, om *types.ObjectMap) {
 	// resolve all pointers
 	fieldName := sch.Title
-	sch = resolveSchema(openrpc, sch)
+	sch = resolveSchema(gwmsgs, sch)
 
 	if len(sch.Properties) > 0 {
 		for key, value := range sch.Properties {
 			value.Title = key
-			dereference(openrpc, sch.Title, value, om)
+			dereference(gwmsgs, sch.Title, value, om)
 		}
-		om.Set(name, types.BasicType{sch.Description, fieldName, getObjectType(openrpc, sch)})
+		om.Set(name, types.BasicType{sch.Description, fieldName, getObjectType(gwmsgs, sch)})
 		return
 	} else if len(sch.OneOf) > 0 {
 		next := sch.OneOf[0]
-		dereference(openrpc, sch.Title, next, om)
-		om.Set(name, types.BasicType{sch.Description, fieldName, getObjectType(openrpc, resolveSchema(openrpc, next))})
+		dereference(gwmsgs, sch.Title, next, om)
+		om.Set(name, types.BasicType{sch.Description, fieldName, getObjectType(gwmsgs, resolveSchema(gwmsgs, next))})
 		return
 	} else if sch.Items != nil {
 		if sch.Items.Schema != nil {
-			dereference(openrpc, sch.Title, *sch.Items.Schema, om)
-			//dereference(openrpc, name, persistTitleAndDesc(sch, *sch.Items.Schema), om)
-			om.Set(name, types.BasicType{sch.Description, sch.Title, fmt.Sprintf("[]%s", getObjectType(openrpc, persistTitleAndDesc(sch, *sch.Items.Schema)))})
+			dereference(gwmsgs, sch.Title, *sch.Items.Schema, om)
+			//dereference(gwmsgs, name, persistTitleAndDesc(sch, *sch.Items.Schema), om)
+			om.Set(name, types.BasicType{sch.Description, sch.Title, fmt.Sprintf("[]%s", getObjectType(gwmsgs, persistTitleAndDesc(sch, *sch.Items.Schema)))})
 		} else if len(sch.Items.Schemas) > 0 {
 			om.Set(name, types.BasicType{sch.Description, fieldName, "[]string"})
 		}
@@ -112,14 +112,14 @@ func dereference(openrpc *types.OpenRPCSpec1, name string, sch spec.Schema, om *
 }
 
 // GetTypes constructs all possible type definitions from the spec
-func GetTypes(openrpc *types.OpenRPCSpec1, om *types.ObjectMap) {
-	for _, m := range openrpc.Messages {
+func GetTypes(gwmsgs *types.GwMsgSpec1, om *types.ObjectMap) {
+	for _, m := range gwmsgs.Messages {
 		name := fmt.Sprintf("%s%s", util.CamelCase(m.Name), params)
 		for _, param := range m.Params {
 			sch := param.Schema
 			sch.Title = util.FirstOf(sch.Title, param.Name)
 			sch.Description = util.FirstOf(sch.Description, param.Description)
-			dereference(openrpc, name, sch, om)
+			dereference(gwmsgs, name, sch, om)
 		}
 		if m.Result != nil {
 			name = fmt.Sprintf("%s%s", util.CamelCase(m.Name), result)
@@ -127,7 +127,7 @@ func GetTypes(openrpc *types.OpenRPCSpec1, om *types.ObjectMap) {
 			sch := res.Schema
 			sch.Title = util.FirstOf(sch.Title, res.Name)
 			sch.Description = util.FirstOf(sch.Description, res.Description)
-			dereference(openrpc, name, sch, om)
+			dereference(gwmsgs, name, sch, om)
 		}
 	}
 }

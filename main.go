@@ -22,18 +22,18 @@ var (
 
 func init() {
 	flag.StringVar(&pkgDir, "dir", "rpc", "set the target directory")
-	flag.StringVar(&specFile, "spec", "", "the openrpc compliant spec")
+	flag.StringVar(&specFile, "spec", "", "the gwmsgs compliant spec")
 	flag.StringVar(&cliCommandName, "cli.name", "CHANGEME", "With -cli, names binary program. Default is FIXME.")
 	flag.BoolVar(&cliGen, "cli", false, "Toggle CLI program generation")
 }
 
-func readSpec(file string) (*types.OpenRPCSpec1, error) {
+func readSpec(file string) (*types.GwMsgSpec1, error) {
 	data, err := ioutil.ReadFile(file)
 	if err != nil {
 		return nil, err
 	}
 
-	spec := types.NewOpenRPCSpec1()
+	spec := types.NewGwMsgSpec1()
 	err = json.Unmarshal(data, spec)
 	if err != nil {
 		return nil, err
@@ -48,33 +48,33 @@ func run() error {
 		return fmt.Errorf("spec file is required")
 	}
 
-	openrpc, err := readSpec(specFile)
+	gwmsgs, err := readSpec(specFile)
 	if err != nil {
 		return err
 	}
 
-	parse.GetTypes(openrpc, openrpc.Objects)
+	parse.GetTypes(gwmsgs, gwmsgs.Objects)
 	box := packr.New("template", "./templates")
 
-	if err = generate.WriteFile(box, "server", pkgDir, openrpc); err != nil {
+	if err = generate.WriteFile(box, "server", pkgDir, gwmsgs); err != nil {
 		return err
 	}
 
-	if err = generate.WriteFile(box, "types", pkgDir, openrpc); err != nil {
+	if err = generate.WriteFile(box, "types", pkgDir, gwmsgs); err != nil {
 		return err
 	}
 
-	if err = generate.WriteDocMd(box, "doc", pkgDir, openrpc); err != nil {
+	if err = generate.WriteDocMd(box, "doc", pkgDir, gwmsgs); err != nil {
 		return fmt.Errorf("MIERROR %s", err)
 	}
 
 	if cliGen {
 		generate.ProgramName = cliCommandName
-		if err = generate.WriteFile(box, "cli", "main", openrpc); err != nil {
+		if err = generate.WriteFile(box, "cli", "main", gwmsgs); err != nil {
 			return err
 		}
 
-		if err = generate.WriteFile(box, "cli_cmd", "cmd", openrpc); err != nil {
+		if err = generate.WriteFile(box, "cli_cmd", "cmd", gwmsgs); err != nil {
 			return err
 		}
 	}

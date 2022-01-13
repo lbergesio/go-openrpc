@@ -39,7 +39,7 @@ func tmpl(t *testing.T) string {
 	data, err := ioutil.ReadFile("test.json")
 	require.NoError(t, err)
 
-	spec := types.NewOpenRPCSpec1()
+	spec := types.NewGwMsgSpec1()
 	err = json.Unmarshal(data, spec)
 	require.NoError(t, err)
 

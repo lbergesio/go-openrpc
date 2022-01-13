@@ -163,8 +163,7 @@ type Components struct {
 	Tags                  map[string]Tag                `json:"tags"`
 }
 
-type OpenRPCSpec1 struct {
-	OpenRPC      string       `json:"openrpc"`
+type GwMsgSpec1 struct {
 	Info         Info         `json:"info"`
 	Servers      []Server     `json:"servers"`
 	Messages     []Message    `json:"messages"`
@@ -174,8 +173,8 @@ type OpenRPCSpec1 struct {
 	Objects *ObjectMap `json:"-"`
 }
 
-func NewOpenRPCSpec1() *OpenRPCSpec1 {
-	return &OpenRPCSpec1{
+func NewGwMsgSpec1() *GwMsgSpec1 {
+	return &GwMsgSpec1{
 		Servers:  make([]Server, 0),
 		Messages: make([]Message, 0),
 

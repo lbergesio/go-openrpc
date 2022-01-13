@@ -110,14 +110,13 @@ type Link struct {
 
 type RequestJson struct {
 	Id      int                    `json:"id"`
-	Jsonrpc string                 `json:"jsonrpc"`
 	Message string                 `json:"message"`
 	Params  map[string]interface{} `json:"params,omitempty"`
 }
 
 type ResponseJson struct {
 	Id      int         `json:"id"`
-	Jsonrpc string      `json:"jsonrpc"`
+	Message string      `json:"message"`
 	Result  interface{} `json:"result"`
 }
 

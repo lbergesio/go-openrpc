@@ -63,7 +63,7 @@
 #### Response
 
 {{ printf "```json" }}
-{{ printf "%s" (messageExampleResponseAsJSONPretty .) }}
+{{ printf "%s" (messageExampleResponseAsJSONPretty $messageName .) }}
 {{ printf "```" }}
 {{- end }}
 

@@ -89,7 +89,6 @@ func messageExampleRequestAsJSONPretty(message string, ex types.ExamplePairing) 
 
 	r := types.RequestJson{
 		Id:      1,
-		Jsonrpc: "2.0.0",
 		Message: message,
 		Params:  params,
 	}
@@ -101,10 +100,10 @@ func messageExampleRequestAsJSONPretty(message string, ex types.ExamplePairing) 
 	return string(j)
 }
 
-func messageExampleResponseAsJSONPretty(ex types.ExamplePairing) string {
+func messageExampleResponseAsJSONPretty(message string, ex types.ExamplePairing) string {
 	r := types.ResponseJson{
 		Id:      1,
-		Jsonrpc: "2.0.0",
+		Message: message,
 		Result:  ex.Result.Value,
 	}
 
